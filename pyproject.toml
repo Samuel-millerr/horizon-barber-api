@@ -1,0 +1,45 @@
+[project]
+name = "horizon-barber-api"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Samuel-millerr",email = "samuel.m.soares10@aluno.senai.br"}
+]
+readme = "README.md"
+requires-python = ">=3.14,<4.0"
+dependencies = [
+    "fastapi[standard] (>=0.136.1,<0.137.0)",
+    "sqlalchemy (>=2.0.49,<3.0.0)",
+    "pydantic (>=2.13.4,<3.0.0)"
+]
+
+[tool.poetry]
+packages = [{include = "horizon_barber_api", from = "src"}]
+
+[tool.ruff]
+line-length = 88
+
+[tool.ruff.lint]
+preview = true
+
+[tool.ruff.format]
+preview = true
+quote-style = "double"
+
+[tool.taskipy.tasks]
+run = "fastapi dev src/horizon_barber_api/app.py"
+
+lint = "ruff check . && ruff check . --diff"
+format = "ruff check . --fix && ruff format ."
+
+create_tables = "py src/horizon_barber_api/scripts/create_tables.py"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "ruff (>=0.15.12,<0.16.0)",
+    "taskipy (>=1.14.1,<2.0.0)"
+]
