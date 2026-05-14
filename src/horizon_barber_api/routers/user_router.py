@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
 from pwdlib import PasswordHash
-from sqlalchemy.orm import Session
 from sqlalchemy.future import select
+from sqlalchemy.orm import Session
 
 from horizon_barber_api.database import get_session
-from horizon_barber_api.schemas import UserRegisterSchema, UserGetSchema
 from horizon_barber_api.models import User
+from horizon_barber_api.schemas import UserRegisterSchema, UserGetSchema, UserLoginSchema
 
 user_router = APIRouter()
 pwd_context = PasswordHash.recommended()
@@ -42,10 +42,10 @@ def register(request: UserRegisterSchema, session: Session = Depends(get_session
 
 
 @user_router.post("/login", response_model=UserGetSchema, status_code=200)
-def login(request: UserRegisterSchema, session: Session = Depends(get_session)):
-    user = get_user_by_username(request.username)
+def login(request: UserLoginSchema, session: Session = Depends(get_session)):
+    user: User = get_user_by_username(request.username, session)
 
-    if request.password != user.password:
+    if not pwd_context.verify(request.password, user.hashed_password):
         raise HTTPException(status_code=403, detail="Incorrect credentials")
     return user
 

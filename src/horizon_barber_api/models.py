@@ -25,15 +25,17 @@ class Appointment(settings.DBBaseModel):
     __tablename__ = "appointment"
 
     id: int = Column(Integer, primary_key=True)
-    service_id: int = Column(Integer, ForeignKey("service.id"))
+    service_id: int = Column(Integer, ForeignKey("barber_service.id"))
     user_id: int = Column(Integer, ForeignKey("user.id"))
+    barber_name: str = Column(String, default="Samuel Soares")
+    observation: str = Column(String)
 
     user = relationship("User", back_populates="appointment")
-    service = relationship("Service", back_populates="appointment")
+    barber_service = relationship("BarberService", back_populates="appointment")
 
 
-class Service(settings.DBBaseModel):
-    __tablename__ = "service"
+class BarberService(settings.DBBaseModel):
+    __tablename__ = "barber_service"
 
     id: int = Column(Integer, primary_key=True)
     name: str = Column(String, unique=True)
@@ -42,4 +44,4 @@ class Service(settings.DBBaseModel):
     duration_minutes: int = Column(Integer)
     icon: str = Column(String)
 
-    appointment = relationship("Appointment", back_populates="service")
+    appointment = relationship("Appointment", back_populates="barber_service")

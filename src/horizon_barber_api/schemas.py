@@ -26,9 +26,31 @@ class UserRegisterSchema(SCBaseModel):
         from_attributes = True
 
 
-class UserLoginrSchema(SCBaseModel):
+class UserLoginSchema(SCBaseModel):
     username: str
     password: str
+
+    class Config:
+        from_attributes = True
+
+class BarberServiceGetSchema(SCBaseModel):
+    id: int
+    name: str
+    description: str
+    price: float
+    duration_minutes: int
+    icon: str
+
+    class Config:
+        from_attributes = True
+
+
+class AppointmentGetSchema(SCBaseModel):
+    id: int
+    service_name: str
+    service_icon: str
+    barber_name: str
+    observation: str
 
     class Config:
         from_attributes = True
