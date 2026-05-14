@@ -11,6 +11,7 @@ class User(settings.DBBaseModel):
 
     id: int = Column(Integer, primary_key=True)
     username: str = Column(String, unique=True)
+    hashed_password: str = Column(String)
     number: str = Column(String)
     url_photo: str = Column(String)
     created_at: datetime = Column(DateTime, server_default=func.now())

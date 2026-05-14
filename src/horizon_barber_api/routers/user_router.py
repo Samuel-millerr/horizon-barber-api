@@ -1,15 +1,26 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pwdlib import PasswordHash
 from sqlalchemy.orm import Session
 from sqlalchemy.future import select
 
 from horizon_barber_api.database import get_session
-from horizon_barber_api.schemas import UserPostSchema, UserGetSchema
+from horizon_barber_api.schemas import UserRegisterSchema, UserGetSchema
 from horizon_barber_api.models import User
 
 user_router = APIRouter()
+pwd_context = PasswordHash.recommended()
 
-@user_router.post("", response_model=UserPostSchema, status_code=201)
-def create(request: UserPostSchema, session: Session = Depends(get_session)):
+
+def get_password_hash(password: str):
+    return pwd_context.hash(password)
+
+
+def verify_password(plain_password: str, hashed_password: str):
+    return pwd_context.verify(plain_password, hashed_password)
+
+
+@user_router.post("/register", response_model=UserGetSchema, status_code=201)
+def register(request: UserRegisterSchema, session: Session = Depends(get_session)):
     query = select(User).filter(User.username == request.username)
     user = session.execute(query).scalar_one_or_none()
 
@@ -18,6 +29,7 @@ def create(request: UserPostSchema, session: Session = Depends(get_session)):
 
     new_user = User(
         username=request.username,
+        hashed_password=get_password_hash(request.password),
         number=request.number,
         url_photo=request.url_photo,
     )
@@ -27,6 +39,16 @@ def create(request: UserPostSchema, session: Session = Depends(get_session)):
     session.refresh(new_user)
 
     return new_user
+
+
+@user_router.post("/login", response_model=UserGetSchema, status_code=200)
+def login(request: UserRegisterSchema, session: Session = Depends(get_session)):
+    user = get_user_by_username(request.username)
+
+    if request.password != user.password:
+        raise HTTPException(status_code=403, detail="Incorrect credentials")
+    return user
+
 
 @user_router.get("", response_model=UserGetSchema, status_code=200)
 def get_user_by_username(username: str, session: Session = Depends(get_session)):
