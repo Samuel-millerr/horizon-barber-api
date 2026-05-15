@@ -33,6 +33,15 @@ class UserLoginSchema(SCBaseModel):
     class Config:
         from_attributes = True
 
+
+class UserUpdateSchema(SCBaseModel):
+    number: Optional[str] = None
+    photoUrl: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
 class BarberServiceGetSchema(SCBaseModel):
     id: int
     name: str
@@ -50,6 +59,15 @@ class AppointmentGetSchema(SCBaseModel):
     service_name: str
     service_icon: str
     barber_name: str
+    observation: str
+
+    class Config:
+        from_attributes = True
+
+
+class AppointmentPostSchema(SCBaseModel):
+    username: str
+    service_id: int
     observation: str
 
     class Config:

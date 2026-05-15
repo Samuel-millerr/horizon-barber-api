@@ -13,7 +13,7 @@ class User(settings.DBBaseModel):
     username: str = Column(String, unique=True)
     hashed_password: str = Column(String)
     number: str = Column(String)
-    url_photo: str = Column(String)
+    url_photo: str = Column(String, nullable=True)
     created_at: datetime = Column(DateTime, server_default=func.now())
 
     appointment = relationship(
@@ -28,7 +28,7 @@ class Appointment(settings.DBBaseModel):
     service_id: int = Column(Integer, ForeignKey("barber_service.id"))
     user_id: int = Column(Integer, ForeignKey("user.id"))
     barber_name: str = Column(String, default="Samuel Soares")
-    observation: str = Column(String)
+    observation: str = Column(String, nullable=True)
 
     user = relationship("User", back_populates="appointment")
     barber_service = relationship("BarberService", back_populates="appointment")

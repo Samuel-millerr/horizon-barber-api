@@ -5,7 +5,7 @@ from sqlalchemy.orm import Session
 
 from horizon_barber_api.database import get_session
 from horizon_barber_api.models import User
-from horizon_barber_api.schemas import UserRegisterSchema, UserGetSchema, UserLoginSchema
+from horizon_barber_api.schemas import UserRegisterSchema, UserGetSchema, UserLoginSchema, UserUpdateSchema
 
 user_router = APIRouter()
 pwd_context = PasswordHash.recommended()
@@ -57,5 +57,25 @@ def get_user_by_username(username: str, session: Session = Depends(get_session))
 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
+
+    return user
+
+@user_router.patch("", response_model=UserGetSchema, status_code=200)
+def update(
+    username: str,
+    data: UserUpdateSchema,
+    session: Session = Depends(get_session),
+):
+    user = get_user_by_username(username, session)
+
+    if data.number is not None:
+        user.number = data.number
+
+    if data.photoUrl is not None:
+        user.url_photo = data.photoUrl
+
+    session.add(user)
+    session.commit()
+    session.refresh(user)
 
     return user
